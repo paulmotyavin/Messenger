@@ -1,0 +1,38 @@
+﻿<Window x:Class="Messenger.TcpClient"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Messenger"
+        mc:Ignorable="d"
+        Title="Клиент" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <Grid Background="#D4CDF4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="0.5*" />
+            <ColumnDefinition  Width="2*"/>
+            <ColumnDefinition Width="0.6*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.9*"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="0.7*"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="Count" Grid.Row="0" Text="Пользователи:"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="22" Background="#FFCCAEFF" />
+        <ListBox Name="UsersList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"/>
+        <ListBox Name="MessagesList" Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="7"/>
+        <Button Name="ExitBt" Height="40" Grid.Row="7" Grid.Column="1" Style="{StaticResource MaterialDesignFlatLightBgButton}" ToolTip="MaterialDesignFlatLightButton" Background="#8B85C1" BorderBrush="#8B85C1" Click="ExitBt_Click">
+            <materialDesign:PackIcon Kind="ExitToApp" Height="35" Width="35" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </Button>
+        <TextBox Name="MessageTbx" KeyDown="SendMessage_KeyDown" materialDesign:TextFieldAssist.TextFieldCornerRadius="5" Grid.Row="7" materialDesign:HintAssist.Hint="Введите сообщение" Padding="5" Background="#7A6F9B" Grid.Column="2" FontSize="18"/>
+        <Button Name="SendBt" Height="40" Grid.Row="7" Grid.Column="3" Style="{StaticResource MaterialDesignFlatLightBgButton}" ToolTip="MaterialDesignFlatLightButton" Background="#8B85C1" BorderBrush="#8B85C1" Click="SendBt_Click">
+            <materialDesign:PackIcon Kind="Send" Height="25" Width="25" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        </Button>
+    </Grid>
+</Window>

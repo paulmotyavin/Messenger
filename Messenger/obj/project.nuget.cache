@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "6pRdUuOqkULO5YNoFXTeHkgkz4THlQmIVgx1RbBadHmodUn5X0xgkltyXzFyfyiBN5eh1BKPtHSq0n4VBqtztA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\paulscriptum\\source\\repos\\Messenger\\Messenger\\Messenger.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\paulscriptum\\.nuget\\packages\\materialdesigncolors\\2.1.2\\materialdesigncolors.2.1.2.nupkg.sha512",
+    "C:\\Users\\paulscriptum\\.nuget\\packages\\materialdesignthemes\\4.8.0\\materialdesignthemes.4.8.0.nupkg.sha512",
+    "C:\\Users\\paulscriptum\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512"
+  ],
+  "logs": []
+}
