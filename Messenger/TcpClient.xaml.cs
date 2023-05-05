@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -30,7 +31,7 @@ namespace Messenger
             InitializeComponent();
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.ConnectAsync(IPServer, 8888);
-
+            sendmsg(Name);
             ReceiveMessage();
         }
 
@@ -40,8 +41,20 @@ namespace Messenger
             {
                 byte[] bytes = new byte[1024];
                 await socket.ReceiveAsync(bytes, SocketFlags.None);
-                string message = Encoding.UTF8.GetString(bytes);
-                MessagesList.Items.Add(message);
+                string message = Encoding.UTF8.GetString(bytes).Trim('\0');
+                if(message.Contains("UsersListFlag"))
+                {
+                    string main = message.Substring(0, message.IndexOf('^'));
+                    string count = main.Split('/').First();
+                    Count.Text = $"Пользователи: {count}";
+                    UsersList.Items.Clear();
+                    foreach (string item in main.Split("/"))
+                    {
+                        if(item != count)
+                            UsersList.Items.Add(item);
+                    }
+                }
+                else MessagesList.Items.Add(message);
             }
         }
 
@@ -49,15 +62,23 @@ namespace Messenger
         {
             if (!token.IsCancellationRequested)
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(msg);
-                await socket.SendAsync(bytes, SocketFlags.None);
+                if (!msg.Contains("/disconnect"))
+                {
+                    byte[] bytes = Encoding.UTF8.GetBytes(msg);
+                    await socket.SendAsync(bytes, SocketFlags.None);
+                }
+                else
+                {
+                    CloseProgram();
+                    socket.Close();
+                    this.Close();
+                } 
             }
         }
 
         private void ExitBt_Click(object sender, RoutedEventArgs e)
         {
-            token = cancellationTokenSource.Token;
-            cancellationTokenSource.Cancel();
+            CloseProgram();
             socket.Close();
             this.Close();
         }
@@ -72,8 +93,7 @@ namespace Messenger
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            token = cancellationTokenSource.Token;
-            cancellationTokenSource.Cancel();
+            CloseProgram();
             MainWindow main = new MainWindow();
             main.Show();
         }
@@ -87,6 +107,17 @@ namespace Messenger
                 sendmsg(message);
                 MessageTbx.Text = null;
             }
+        }
+        private void CloseProgram()
+        {
+            Disconnect();
+            token = cancellationTokenSource.Token;
+            cancellationTokenSource.Cancel();
+        }
+
+        private void Disconnect()
+        {
+            sendmsg($"{Name}/DisconnectFromServer");
         }
     }
 }

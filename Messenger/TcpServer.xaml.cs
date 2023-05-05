@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -40,8 +42,7 @@ namespace Messenger
             DateTime date = DateTime.Now;
             string log = $"[{date}]\nНовый пользователь: {Name}";
             usersList.Add(Name);
-            UsersList.ItemsSource = null;
-            UsersList.ItemsSource = usersList;
+            UsersList.Items.Add(Name);
             logs.Add(log);
             LogList.ItemsSource = logs;
             Count.Text = $"Пользователи: {usersList.Count}";
@@ -55,9 +56,6 @@ namespace Messenger
             {
                 var client = await socket.AcceptAsync();
                 clients.Add(client);
-                UsersList.ItemsSource = null;
-                UsersList.ItemsSource = clients;
-                Count.Text = $"Пользователи: {clients.Count}";
                 ReceiveMessage(client);
             }
         }
@@ -68,13 +66,47 @@ namespace Messenger
             {
                 byte[] bytes = new byte[1024];
                 await client.ReceiveAsync(bytes, SocketFlags.None);
-                string message = Encoding.UTF8.GetString(bytes);
-
-                MessagesList.Items.Add(message);
-
-                foreach (var item in clients)
+                string message = Encoding.UTF8.GetString(bytes).Trim('\0');
+                if (!message.StartsWith("["))
                 {
-                    SendMessage(item, message);
+                    if (message.Contains("DisconnectFromServer"))
+                    {
+                        string msg = message.Split('/').First();
+                        usersList.Remove(msg);
+                        UsersList.Items.Remove(msg);
+                        DateTime date = DateTime.Now;
+                        string log = $"[{date}]\nСтарый пользователь: {msg}";
+                        Count.Text = $"Пользователи: {usersList.Count}";
+                        
+                        logs.Add(log);
+                        LogList.ItemsSource = null;
+                        LogList.ItemsSource = logs;
+                    }
+                    else
+                    {
+                        usersList.Add(message);
+                        UsersList.Items.Add(message);
+                        DateTime date = DateTime.Now;
+                        string log = $"[{date}]\nНовый пользователь: {message}";
+                        logs.Add(log);
+                        Count.Text = $"Пользователи: {usersList.Count}";
+                        LogList.ItemsSource = null;
+                        LogList.ItemsSource = logs;
+                    }
+                    string str = usersList.Count + "/" + usersList.Aggregate((x, y) => x + "/" + y);
+                    str += "^UsersListFlag";
+                    foreach (var item in clients)
+                    {
+                        SendMessage(item, str);
+                    }
+                }
+                else
+                {
+                    foreach (var item in clients)
+                    {
+                        SendMessage(item, message);
+                    }
+                    MessagesList.Items.Add(message);
                 }
             }
         }
@@ -90,8 +122,7 @@ namespace Messenger
 
         private void ExitBt_Click(object sender, RoutedEventArgs e)
         {
-            token = cancellationTokenSource.Token;
-            cancellationTokenSource.Cancel();
+            CloseProgram();
             socket.Close();
             this.Close();
         }
@@ -100,14 +131,27 @@ namespace Messenger
         {
             if (!token.IsCancellationRequested)
             {
-                DateTime now = DateTime.Now;
-                foreach (var item in clients)
+                if (msg.Contains("/disconnect"))
                 {
-                    SendMessage(item, msg);
+                    CloseProgram();
+                    socket.Close();
+                    this.Close();
                 }
-                MessagesList.Items.Add(msg);
+                else
+                {
+                    foreach (var item in clients)
+                    {
+                        SendMessage(item, msg);
+                    }
+                    MessagesList.Items.Add(msg);
+                }
             }
-            
+
+        }
+
+        private void SendMessagesToClients()
+        {
+
         }
 
         private void LogChatBt_Click(object sender, RoutedEventArgs e)
@@ -139,10 +183,9 @@ namespace Messenger
 
         private void Window_Closing(object sender, EventArgs e)
         {
-            token = cancellationTokenSource.Token;
-            cancellationTokenSource.Cancel();
+            CloseProgram();
             MainWindow main = new MainWindow();
-                main.Show();
+            main.Show();
         }
 
         private void SendMessage_KeyDown(object sender, KeyEventArgs e)
@@ -154,6 +197,12 @@ namespace Messenger
                 sendmsg(message);
                 MessageTbx.Text = "";
             }
+        }
+        private void CloseProgram()
+        {
+            token = cancellationTokenSource.Token;
+            cancellationTokenSource.Cancel();
+            socket.Close();
         }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="600" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="Авторизация" Height="350" Width="600" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid Background="#D4CDF4">
         <Grid.RowDefinitions>
             <RowDefinition/>
