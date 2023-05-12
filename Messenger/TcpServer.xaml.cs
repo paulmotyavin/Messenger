@@ -146,13 +146,8 @@ namespace Messenger
                     MessagesList.Items.Add(msg);
                 }
             }
-
         }
 
-        private void SendMessagesToClients()
-        {
-
-        }
 
         private void LogChatBt_Click(object sender, RoutedEventArgs e)
         {

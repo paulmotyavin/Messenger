@@ -30,7 +30,7 @@ namespace Messenger
         {
             InitializeComponent();
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.ConnectAsync(IPServer, 8888);
+            socket.Connect(IPServer, 8888);
             sendmsg(Name);
             ReceiveMessage();
         }
@@ -70,7 +70,6 @@ namespace Messenger
                 else
                 {
                     CloseProgram();
-                    socket.Close();
                     this.Close();
                 } 
             }
@@ -79,7 +78,6 @@ namespace Messenger
         private void ExitBt_Click(object sender, RoutedEventArgs e)
         {
             CloseProgram();
-            socket.Close();
             this.Close();
         }
 
